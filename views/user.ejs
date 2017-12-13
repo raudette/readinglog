@@ -1,0 +1,33 @@
+<html>
+  <head>
+	<title><%= username %></title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+  </head>
+  <body>
+    <h1>Welcome <%= username%></h1>
+    <p>Add a book</p>
+    <form action="/user/<%= id%>/upload" method="post" enctype="multipart/form-data">
+		<input type="file" accept="image/*;capture=camera" name="barcodefile" onchange="javascript:this.form.submit();" />
+	</form>
+
+	<table>
+		<tr>
+			 <th>isbn</th>
+			 <th>author</th>
+			 <th>title</th>
+			 <th>date</th>
+		</tr>
+		<% for(var i=0; i < booklist.length; i++) { %>
+		   <tr>
+			 <td><%= booklist[i].isbn %></td>
+			 <td><%= booklist[i].author %></td>
+			 <td><%= booklist[i].title %></td>
+			 <td><%= booklist[i].date %></td>
+		   </tr>
+		<% } %>
+	</table>
+  </body>
+</html>
