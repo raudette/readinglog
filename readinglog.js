@@ -5,6 +5,7 @@ var app = express()
 var ejs = require('ejs');
 var mysql = require('mysql');
 var fs = require('fs');
+var json2csv = require('json2csv');
 
 //Config
 var data = fs.readFileSync('./readinglogconfig.json'),Config;
@@ -109,8 +110,6 @@ app.post('/user/:id/upload', function (req, res){
 						//console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
 						//console.log('body:', body); // Print the HTML for the Google homepage.
 						var book = JSON.parse(body);
-						console.log(book.items[0].volumeInfo.title);
-						console.log(book.items[0].volumeInfo.authors[0]);
 						if (book.totalItems > 0) {
 							pool.getConnection(function(err, connection) {
 								title=connection.escape(book.items[0].volumeInfo.title)
@@ -122,9 +121,10 @@ app.post('/user/:id/upload', function (req, res){
 								connection.release();
 								});
 							});
-						res.redirect('/user/'+req.params.id);
+						res.redirect('/user/'+req.params.id+'?status=bookadded');
 						}
 						else {
+							res.redirect('/user/'+req.params.id+'?status=booknotfound');	
 						}
 						
 						//console.log(body.items[0].volumeInfo.title)
@@ -132,7 +132,7 @@ app.post('/user/:id/upload', function (req, res){
 						});
 					}
 				else {
-					res.sendStatus(204);
+					res.redirect('/user/'+req.params.id+'?status=barcodeerror');
 				}
 			}
 		);
@@ -160,6 +160,27 @@ console.log(req.params.id);
 	});
 });	
 
+app.get('/user/:id/csv', function(req, res){
+
+fields = ['isbn', 'author', 'title', 'date'];
+
+	pool.getConnection(function(err, connection) {
+		connection.query(strQuery , function(err, row) {
+			json2csv({ data: row, fields: fields }, function(err, csv) {
+				res.setHeader('Content-disposition', 'attachment; filename=readinglog.csv');
+				res.set('Content-Type', 'text/csv');
+				res.status(200).send(csv);
+				console.log(err);
+				console.log(csv);
+				});
+			});
+		connection.release();
+
+	});
+
+
+});	
+
 app.get('/user/:id', function(req, res){
 
 strQuery= "select username from user where userid = "+req.params.id;
@@ -170,7 +191,7 @@ var readinglog
 	pool.getConnection(function(err, connection) {
 		connection.query(strQuery , function(err, row) {
 			username=row[0].username;
-			strQuery = "SELECT * FROM readinglog.readinglog where userid="+req.params.id;
+			strQuery = "SELECT * FROM readinglog.readinglog where userid="+req.params.id+"  order by date desc, idreadinglog desc";
 			console.log(strQuery)
 			connection.query( strQuery, function(err, rows) {
 				readinglog=rows;
@@ -191,15 +212,5 @@ var readinglog
 
 
 
-app.get('/user/:id/list', function(req, res){		
-		
-	strQuery = "SELECT * FROM readinglog.readinglog="+req.params.id;
 
-	pool.getConnection(function(err, connection) {
-	connection.query( strQuery, function(err, rows) {
-		res.send(JSON.stringify(rows))
-		connection.release();
-		});
-	});
 
-}); 

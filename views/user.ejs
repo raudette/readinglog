@@ -6,28 +6,53 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 
   </head>
-  <body>
+  <body onload="update()">
+	
+	<script type="text/javascript">
+		
+     function update() {
+
+			uri = decodeURI(window.location.search);
+
+			if (uri.search("status=booknotfound") > 0)
+			{
+				$('.error').html("<em>Error - Scanned bar code, but unable to find book</em>");
+			}
+
+			if (uri.search("status=barcodeerror") > 0)
+			{
+				$('.error').html("<em>Error - Unable to read bar code</em>");
+			}
+
+			if (uri.search("status=bookadded") > 0)
+			{
+				$('.success').html("<em>Successfully added book to reading log</em>");
+			}
+	}	
+</script>  
+	  
     <h1>Welcome <%= username%></h1>
-    <p>Add a book</p>
+    <p class="error bg-danger"></p>
+    <p class="success bg-success"></p>
+    <p>Click Browse to scan a book's bar code to add it to your reading log.</p>
     <form action="/user/<%= id%>/upload" method="post" enctype="multipart/form-data">
 		<input type="file" accept="image/*;capture=camera" name="barcodefile" onchange="javascript:this.form.submit();" />
 	</form>
 
-	<table>
+	<table class="table">
 		<tr>
-			 <th>isbn</th>
-			 <th>author</th>
-			 <th>title</th>
-			 <th>date</th>
+			 <th>Author</th>
+			 <th>Title</th>
+			 <th>Date</th>
 		</tr>
 		<% for(var i=0; i < booklist.length; i++) { %>
 		   <tr>
-			 <td><%= booklist[i].isbn %></td>
 			 <td><%= booklist[i].author %></td>
 			 <td><%= booklist[i].title %></td>
-			 <td><%= booklist[i].date %></td>
+			 <td><%= booklist[i].date.toLocaleDateString() %></td>
 		   </tr>
 		<% } %>
 	</table>
+<a href="/user/<%= id%>/csv" class="btn btn-primary" role="button">Export to Spreadsheet</a>
   </body>
 </html>
