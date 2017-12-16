@@ -1,6 +1,6 @@
 <html>
   <head>
-	<title><%= username %></title>
+	<title><%= username %>'s Reading Log</title>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -9,6 +9,18 @@
   <body onload="update()">
 	
 	<script type="text/javascript">
+		
+	 function deleteReadingLogEntry(id) {
+
+		 $.ajax({
+			url: '/readinglog/'+id,
+			type: 'DELETE',
+			success: function(result) {
+				location.reload(); 
+			}
+		});    
+	 }
+	 
 		
      function update() {
 
@@ -30,29 +42,99 @@
 			}
 	}	
 </script>  
-	  
-    <h1>Welcome <%= username%></h1>
+<div class="row">
+  <div class="col-sm-12">
+    <h1>Welcome <%= username%> to your reading log</h1>
     <p class="error bg-danger"></p>
     <p class="success bg-success"></p>
+  </div>
+</div>	  
+
+<div class="row">
+  <div class="col-sm-4">
+
+<h3>Add Book by Barcode</h3>
     <p>Click Browse to scan a book's bar code to add it to your reading log.</p>
     <form action="/user/<%= id%>/upload" method="post" enctype="multipart/form-data">
 		<input type="file" accept="image/*;capture=camera" name="barcodefile" onchange="javascript:this.form.submit();" />
 	</form>
 
+<h3>Add a book manually</h3>
+<form method="POST" action="/user/<%= id%>/addbook">
+<!-- Form Name -->
+
+<!-- Text input-->
+  <label  for="title">Title</label>  
+  <input id="title" name="title" placeholder="Green Eggs and Ham" class="form-control input-md" required="" type="text">
+
+<!-- Text input-->
+  <label for="author">Author</label>  
+  <input id="author" name="author" placeholder="Dr. Seuss" class="form-control input-md" required="" type="text">
+
+<!-- Button -->
+<button class="btn btn-primary"  type="submit" >Add Book</button>
+</form>
+
+<!-- Form Name -->
+<h3>Reading Log Filter</h3>
+<form action="/user/<%= id%>">
+
+  <label class="col-md-4 control-label" for="selectbasic">Select Year</label>
+    <select id="year" name="year" class="form-control">
+      <option value="">All</option>
+      <option value="2017">2017</option>
+      <option value="2018">2018</option>
+      <option value="2019">2019</option>
+    </select>
+
+<!-- Select Basic -->
+  <label class="col-md-4 control-label" for="selectbasic">Select Month</label>
+    <select id="month" name="month" class="form-control">
+      <option value="">All</option>
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3">March</option>
+      <option value="4">April</option>
+      <option value="5">May</option>
+      <option value="6">June</option>
+      <option value="7">July</option>
+      <option value="8">August</option>
+      <option value="9">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select>
+
+<!-- Button -->
+<button class="btn btn-primary"  type="submit" >Apply Filter</button>
+</form>
+
+<h3>Export</h3>
+<a href="/user/<%= id%>/csv?year=<%= year%>&month=<%= month%>" class="btn btn-primary" role="button" onclick="alert(window.location.search))">Export to Spreadsheet</a>
+
+  </div>
+
+  <div class="col-sm-8">
+<h3>Reading Log</h3>
 	<table class="table">
 		<tr>
 			 <th>Author</th>
 			 <th>Title</th>
 			 <th>Date</th>
+			 <th>Delete</th>
 		</tr>
 		<% for(var i=0; i < booklist.length; i++) { %>
 		   <tr>
 			 <td><%= booklist[i].author %></td>
 			 <td><%= booklist[i].title %></td>
 			 <td><%= booklist[i].date.toLocaleDateString() %></td>
+			 <td><button type="button" class="btn" onclick="deleteReadingLogEntry(<%= booklist[i].idreadinglog%>)">Delete</button></td>
 		   </tr>
 		<% } %>
 	</table>
-<a href="/user/<%= id%>/csv" class="btn btn-primary" role="button">Export to Spreadsheet</a>
+
+  </div>
+</div>	  
+
   </body>
 </html>
