@@ -54,7 +54,7 @@
   <div class="col-sm-4">
 
 <h3>Add Book by Barcode</h3>
-    <p>Click Browse to scan a book's bar code to add it to your reading log.</p>
+    <p>Click Browse to scan a book's bar code to add it to your reading log.  On Android/iPhone devices, this will allow you to take a picture of the barcode with your phone's camera.  On a PC, you will have to take a picture first, and select it with a file browser.  It may take a minute or two to upload the image and scan it on our server, depending on the speed of your Internet connection.</p>
     <form action="/user/<%= id%>/upload" method="post" enctype="multipart/form-data">
 		<input type="file" accept="image/*;capture=camera" name="barcodefile" onchange="javascript:this.form.submit();" />
 	</form>
