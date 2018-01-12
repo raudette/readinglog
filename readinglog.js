@@ -64,7 +64,8 @@ app.post('/user/:id/upload', function (req, res){
 						//console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
 						//console.log('body:', body); // Print the HTML for the Google homepage.
 						var book = JSON.parse(body);
-						if (book.totalItems > 0) {
+						console.log(book);
+						if ((book.totalItems > 0)&&(typeof book.items) !== 'undefined') {
 							pool.getConnection(function(err, connection) {
 								title=connection.escape(book.items[0].volumeInfo.title)
 								author=connection.escape(book.items[0].volumeInfo.authors[0])
